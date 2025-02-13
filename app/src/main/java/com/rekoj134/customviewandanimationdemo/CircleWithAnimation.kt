@@ -7,7 +7,12 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
+import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnRepeat
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import kotlin.math.abs
 
 class CircleWithAnimation : View {
     private var radius = 100f
@@ -16,8 +21,8 @@ class CircleWithAnimation : View {
         color = Color.parseColor("#E13C3C")
     }
     private var scaleFactor = 1f
-    private var scaleFactorForCenter = 1f
-    private var alphaFactor = 1f
+    private var scaleFactor2 = 1f
+
 
     constructor(context: Context) : super(context) {
         initView()
@@ -36,10 +41,10 @@ class CircleWithAnimation : View {
     }
 
     private fun startCircleAnimation() {
-        val animator = ValueAnimator.ofFloat(0.5f, 1f)
+        val animator = ValueAnimator.ofFloat(0.1f, 0.4f)
         animator.duration = 500
         animator.repeatCount = ValueAnimator.INFINITE
-        animator.repeatMode = ValueAnimator.REVERSE
+        animator.repeatMode = ValueAnimator.RESTART
         animator.interpolator = FastOutLinearInInterpolator()
         animator.addUpdateListener {
             scaleFactor = it.animatedValue as Float
@@ -47,13 +52,13 @@ class CircleWithAnimation : View {
         }
         animator.start()
 
-        val animator2 = ValueAnimator.ofFloat(0.5f, 1f)
-        animator2.duration = 300
+        val animator2 = ValueAnimator.ofFloat(0f, 0.8f)
+        animator2.duration = 1000
         animator2.repeatCount = ValueAnimator.INFINITE
-        animator2.repeatMode = ValueAnimator.REVERSE
-        animator2.interpolator = FastOutLinearInInterpolator()
+        animator2.repeatMode = ValueAnimator.RESTART
+        animator2.interpolator = FastOutSlowInInterpolator()
         animator2.addUpdateListener {
-            scaleFactorForCenter = it.animatedValue as Float
+            scaleFactor2 = it.animatedValue as Float
             invalidate()
         }
         animator2.start()
@@ -65,13 +70,9 @@ class CircleWithAnimation : View {
     }
 
     private fun drawCircle(canvas: Canvas) {
-        paint.alpha = (0.2 * 255).toInt()
-        canvas.drawCircle(width/2f, height/2f, (radius + radius*0.6f) * scaleFactor, paint)
-        paint.alpha = (0.4 * 255).toInt()
-        canvas.drawCircle(width/2f, height/2f, (radius + radius*0.4f) * scaleFactor, paint)
-        paint.alpha = (0.6 * 255).toInt()
-        canvas.drawCircle(width/2f, height/2f, (radius + radius*0.2f) * scaleFactor, paint)
+        paint.alpha = 150
+        canvas.drawCircle(width/2f, height/2f, radius * scaleFactor2, paint)
         paint.alpha = 255
-        canvas.drawCircle(width/2f, height/2f, radius * scaleFactorForCenter, paint)
+        canvas.drawCircle(width/2f, height/2f, radius * scaleFactor, paint)
     }
 }
